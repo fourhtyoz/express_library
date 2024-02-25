@@ -4,6 +4,13 @@ import LeftMenu from './components/layout/LeftMenu';
 import Footer from './components/layout/Footer';
 import './App.scss'
 
+// TODO:
+// redux store
+// styles
+// all api requests
+// profile
+// responsive design
+
 function App() {
   return (
     <div className='page-container'>
