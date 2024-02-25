@@ -21,27 +21,32 @@ const logger = require('morgan');
 const compression = require('compression')
 const helmet = require("helmet");
 const RateLimit = require("express-rate-limit");
-const mongoose = require('mongoose')
 
-mongoose.set('strictQuery', false)
+// DB Setup
 const mongoDB = 'mongodb://127.0.0.1:27017/library'
-main().catch((err) => console.log(err));
+const mongoose = require('mongoose')
+mongoose.set('strictQuery', false)
+connectToDB()
 
-async function main() {
-  await mongoose.connect(mongoDB);
+async function connectToDB() {
+  try {
+    await mongoose.connect(mongoDB);
+    console.log('Connected to DB')
+  }
+  catch (e) {
+    console.error(e)
+  }
 }
 
+// Routers
 const indexRouter = require('./routes/index');
 const usersRouter = require('./routes/users');
 const catalogRouter = require('./routes/catalog')
 
 const app = express();
 
-// view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
-
-// Set CSP headers to allow our Bootstrap and Jquery to be served
 app.use(
   helmet.contentSecurityPolicy({
     directives: {
@@ -49,13 +54,10 @@ app.use(
     },
   }),
 );
-const limiter = RateLimit({
-  windowMs: 1 * 60 * 1000, // 1 minute
-  max: 20,
-});
+
 // TODO: apply the rate limit to specific requests
-// Apply rate limiter to all requests
-app.use(limiter);
+app.use(RateLimit({windowMs: 1 * 60 * 1000, max: 20}));
+
 // FIXME: wont be needed once nginx is setup
 app.use(compression()); // Compress all routes
 app.use(logger('dev'));
@@ -67,16 +69,17 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/catalog', catalogRouter)
-// catch 404 and forward to error handler
+
+// Error handling
 app.use(function(req, res, next) {
   next(createError(404));
 });
-// error handler
+
 app.use(function(err, req, res, next) {
   // set locals, only providing error in development
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};
-  // render the error page
+
   res.status(err.status || 500);
   res.render('error');
 });
