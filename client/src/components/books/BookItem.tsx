@@ -1,7 +1,4 @@
-interface BookItemProps {
-    title: string,
-    author: string    
-}
+import { BookItemProps } from "../../common/interfaces"
 
 export default function BookItem({title, author}: BookItemProps) {
         return (

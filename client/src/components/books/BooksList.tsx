@@ -1,9 +1,5 @@
 import BookItem from "./BookItem"
-import { BookType } from "../../types/BookType"
-
-export interface BooksListProps {
-    books: BookType[]
-}
+import { BooksListProps } from "../../common/interfaces"
 
 export default function BooksList({books}:BooksListProps) {
     return (

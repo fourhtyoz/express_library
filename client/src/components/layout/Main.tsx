@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react"
 import BooksList from "../books/BooksList"
-import { BookType } from "../../types/BookType"
 import axios from "axios"
 
 
