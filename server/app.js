@@ -1,5 +1,5 @@
 // TODO:
-// es module instead of commonjs
+// api
 // admin
 // auth (jwt + any other popular auth model)
 // users
@@ -12,7 +12,6 @@
 // dockerize
 // ci/cd on github
 // grafana + sentry
-
 
 const createError = require('http-errors');
 const express = require('express');
@@ -54,8 +53,10 @@ const limiter = RateLimit({
   windowMs: 1 * 60 * 1000, // 1 minute
   max: 20,
 });
+// TODO: apply the rate limit to specific requests
 // Apply rate limiter to all requests
 app.use(limiter);
+// FIXME: wont be needed once nginx is setup
 app.use(compression()); // Compress all routes
 app.use(logger('dev'));
 app.use(express.json());
