@@ -1,59 +1,55 @@
-const BookInstance = require("../models/bookinstance");
-const Book = require("../models/book");
-const asyncHandler = require("express-async-handler");
-const { body, validationResult } = require("express-validator");
+import BookInstance, { find, findById } from '../models/bookinstance';
+import { find as _find } from '../models/book';
+import asyncHandler from 'express-async-handler';
+import { body, validationResult } from 'express-validator';
 
-// Display list of all BookInstances.
-exports.bookinstance_list = asyncHandler(async (req, res, next) => {
-    const allBookInstance = await BookInstance.find().populate('book').exec()
-    res.render("bookinstance_list", {
-        title: "Book Instance List",
+export const bookinstance_list = asyncHandler(async (req, res, next) => {
+    const allBookInstance = await find().populate('book').exec()
+    res.render('bookinstance_list', {
+        title: 'Book Instance List',
         bookinstance_list: allBookInstance,
     })
 });
 
-// Display detail page for a specific BookInstance.
-exports.bookinstance_detail = asyncHandler(async (req, res, next) => {
-    const bookInstance = await BookInstance.findById(req.params.id)
-      .populate("book")
+export const bookinstance_detail = asyncHandler(async (req, res, next) => {
+    const bookInstance = await findById(req.params.id)
+      .populate('book')
       .exec();
   
     if (bookInstance === null) {
       // No results.
-      const err = new Error("Book copy not found");
+      const err = new Error('Book copy not found');
       err.status = 404;
       return next(err);
     }
   
-    res.render("bookinstance_detail", {
-      title: "Book:",
+    res.render('bookinstance_detail', {
+      title: 'Book:',
       bookinstance: bookInstance,
     });
   });
   
 
-// Display BookInstance create form on GET.
-exports.bookinstance_create_get = asyncHandler(async (req, res, next) => {
-    const allBooks = await Book.find({}, "title").sort({ title: 1 }).exec();
+export const bookinstance_create_get = asyncHandler(async (req, res, next) => {
+    const allBooks = await _find({}, 'title').sort({ title: 1 }).exec();
   
-    res.render("bookinstance_form", {
-      title: "Create BookInstance",
+    res.render('bookinstance_form', {
+      title: 'Create BookInstance',
       book_list: allBooks,
     });
   });
   
 
-// Handle BookInstance create on POST.
-exports.bookinstance_create_post = [
+export const bookinstance_create_post = [
     // Validate and sanitize fields.
-    body("book", "Book must be specified").trim().isLength({ min: 1 }).escape(),
-    body("imprint", "Imprint must be specified")
+    body('book', 'Book must be specified').trim().isLength({ min: 1 }).escape(),
+    body('imprint', 'Imprint must be specified')
       .trim()
       .isLength({ min: 1 })
       .escape(),
-    body("status").escape(),
-    body("due_back", "Invalid date")
-      .optional({ values: "falsy" })
+    body('status').escape(),
+    body('due_back', 'Invalid date')
+      .optional({ values: 'falsy' })
       .isISO8601()
       .toDate(),
   
@@ -73,10 +69,10 @@ exports.bookinstance_create_post = [
       if (!errors.isEmpty()) {
         // There are errors.
         // Render form again with sanitized values and error messages.
-        const allBooks = await Book.find({}, "title").sort({ title: 1 }).exec();
+        const allBooks = await _find({}, 'title').sort({ title: 1 }).exec();
   
-        res.render("bookinstance_form", {
-          title: "Create BookInstance",
+        res.render('bookinstance_form', {
+          title: 'Create BookInstance',
           book_list: allBooks,
           selected_book: bookInstance.book._id,
           errors: errors.array(),
@@ -92,22 +88,18 @@ exports.bookinstance_create_post = [
   ];
   
 
-// Display BookInstance delete form on GET.
-exports.bookinstance_delete_get = asyncHandler(async (req, res, next) => {
-  res.send("NOT IMPLEMENTED: BookInstance delete GET");
+export const bookinstance_delete_get = asyncHandler(async (req, res, next) => {
+  res.send('NOT IMPLEMENTED: BookInstance delete GET');
 });
 
-// Handle BookInstance delete on POST.
-exports.bookinstance_delete_post = asyncHandler(async (req, res, next) => {
-  res.send("NOT IMPLEMENTED: BookInstance delete POST");
+export const bookinstance_delete_post = asyncHandler(async (req, res, next) => {
+  res.send('NOT IMPLEMENTED: BookInstance delete POST');
 });
 
-// Display BookInstance update form on GET.
-exports.bookinstance_update_get = asyncHandler(async (req, res, next) => {
-  res.send("NOT IMPLEMENTED: BookInstance update GET");
+export const bookinstance_update_get = asyncHandler(async (req, res, next) => {
+  res.send('NOT IMPLEMENTED: BookInstance update GET');
 });
 
-// Handle bookinstance update on POST.
-exports.bookinstance_update_post = asyncHandler(async (req, res, next) => {
-  res.send("NOT IMPLEMENTED: BookInstance update POST");
+export const bookinstance_update_post = asyncHandler(async (req, res, next) => {
+  res.send('NOT IMPLEMENTED: BookInstance update POST');
 });

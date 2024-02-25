@@ -1,70 +1,66 @@
-const Author = require("../models/author");
-const Book = require('../models/book')
-const asyncHandler = require("express-async-handler");
-const { body, validationResult } = require("express-validator");
+import Author, { find, findById, findByIdAndDelete, findByIdAndUpdate } from '../models/author';
+import { find as _find } from '../models/book';
+import asyncHandler from 'express-async-handler';
+import { body, validationResult } from 'express-validator';
 
-// Display list of all Authors.
-exports.author_list = asyncHandler(async (req, res, next) => {
-    const allAuthors = await Author.find().sort({ family_name: 1 }).exec();
-    res.render("author_list", {
-      title: "Author List",
+export const author_list = asyncHandler(async (req, res, next) => {
+    const allAuthors = await find().sort({ family_name: 1 }).exec();
+    res.render('author_list', {
+      title: 'Author List',
       author_list: allAuthors,
     });
 });
 
-// Display detail page for a specific Author.
-exports.author_detail = asyncHandler(async (req, res, next) => {
+export const author_detail = asyncHandler(async (req, res, next) => {
     // Get details of author and all their books (in parallel)
     const [author, allBooksByAuthor] = await Promise.all([
-      Author.findById(req.params.id).exec(),
-      Book.find({ author: req.params.id }, "title summary").exec(),
+      findById(req.params.id).exec(),
+      _find({ author: req.params.id }, 'title summary').exec(),
     ]);
   
     if (author === null) {
       // No results.
-      const err = new Error("Author not found");
+      const err = new Error('Author not found');
       err.status = 404;
       return next(err);
     }
   
-    res.render("author_detail", {
-      title: "Author Detail",
+    res.render('author_detail', {
+      title: 'Author Detail',
       author: author,
       author_books: allBooksByAuthor,
     });
   });
   
 
-// Display Author create form on GET.
-exports.author_create_get = asyncHandler(async (req, res, next) => {
-    res.render("author_form", { title: "Create Author" });
+export const author_create_get = asyncHandler(async (req, res, next) => {
+    res.render('author_form', { title: 'Create Author' });
 });
 
-// Handle Author create on POST.
-exports.author_create_post = [
+export const author_create_post = [
     // Validate and sanitize fields.
-    body("first_name")
+    body('first_name')
       .trim()
       .isLength({ min: 1 })
       .escape()
-      .withMessage("First name must be specified.")
+      .withMessage('First name must be specified.')
       .isAlphanumeric()
-      .withMessage("First name has non-alphanumeric characters."),
-    body("family_name")
+      .withMessage('First name has non-alphanumeric characters.'),
+    body('family_name')
       .trim()
       .isLength({ min: 1 })
       .escape()
-      .withMessage("Family name must be specified.")
+      .withMessage('Family name must be specified.')
       .isAlphanumeric()
-      .withMessage("Family name has non-alphanumeric characters."),
+      .withMessage('Family name has non-alphanumeric characters.'),
       
     // TODO: fix these
-    body("date_of_birth", "Invalid date of birth"),
-      // .optional({ values: "falsy" })
+    body('date_of_birth', 'Invalid date of birth'),
+      // .optional({ values: 'falsy' })
       // .isISO8601()
       // .toDate(),
-    body("date_of_death", "Invalid date of death"),
-      // .optional({ values: "falsy" })
+    body('date_of_death', 'Invalid date of death'),
+      // .optional({ values: 'falsy' })
       // .isISO8601()
       // .toDate(),
   
@@ -83,8 +79,8 @@ exports.author_create_post = [
   
       if (!errors.isEmpty()) {
         // There are errors. Render form again with sanitized values/errors messages.
-        res.render("author_form", {
-          title: "Create Author",
+        res.render('author_form', {
+          title: 'Create Author',
           author: author,
           errors: errors.array(),
         });
@@ -101,64 +97,60 @@ exports.author_create_post = [
   ];
   
 
-// Display Author delete form on GET.
-exports.author_delete_get = asyncHandler(async (req, res, next) => {
+export const author_delete_get = asyncHandler(async (req, res, next) => {
     // Get details of author and all their books (in parallel)
     const [author, allBooksByAuthor] = await Promise.all([
-      Author.findById(req.params.id).exec(),
-      Book.find({ author: req.params.id }, "title summary").exec(),
+      findById(req.params.id).exec(),
+      _find({ author: req.params.id }, 'title summary').exec(),
     ]);
   
     if (author === null) {
       // No results.
-      res.redirect("/catalog/authors");
+      res.redirect('/catalog/authors');
     }
   
-    res.render("author_delete", {
-      title: "Delete Author",
+    res.render('author_delete', {
+      title: 'Delete Author',
       author: author,
       author_books: allBooksByAuthor,
     });
   });
   
 
-// Handle Author delete on POST.
-exports.author_delete_post = asyncHandler(async (req, res, next) => {
+export const author_delete_post = asyncHandler(async (req, res, next) => {
     // Get details of author and all their books (in parallel)
     const [author, allBooksByAuthor] = await Promise.all([
-      Author.findById(req.params.id).exec(),
-      Book.find({ author: req.params.id }, "title summary").exec(),
+      findById(req.params.id).exec(),
+      _find({ author: req.params.id }, 'title summary').exec(),
     ]);
   
     if (allBooksByAuthor.length > 0) {
       // Author has books. Render in same way as for GET route.
-      res.render("author_delete", {
-        title: "Delete Author",
+      res.render('author_delete', {
+        title: 'Delete Author',
         author: author,
         author_books: allBooksByAuthor,
       });
       return;
     } else {
       // Author has no books. Delete object and redirect to the list of authors.
-      await Author.findByIdAndDelete(req.body.authorid);
-      res.redirect("/catalog/authors");
+      await findByIdAndDelete(req.body.authorid);
+      res.redirect('/catalog/authors');
     }
   });
   
 
-// Display Author update form on GET.
-exports.author_update_get = asyncHandler(async (req, res, next) => {
-  const author = await Author.findById(req.params.id).exec()
+export const author_update_get = asyncHandler(async (req, res, next) => {
+  const author = await findById(req.params.id).exec()
   if (author) {
     res.render('author_form', {author: author})
   }
   else {
-    res.redirect("/catalog/authors");
+    res.redirect('/catalog/authors');
   }
 });
 
-// Handle Author update on POST.
-exports.author_update_post = [
+export const author_update_post = [
   body('first_name')
     .trim()
     .isLength({min: 1})
@@ -193,7 +185,7 @@ exports.author_update_post = [
       res.render('author_form', {title: 'Updated author', author: author, errors: errors})
       return;
     } else {
-      const updatedAuthor = await Author.findByIdAndUpdate(req.params.id, author, {});
+      const updatedAuthor = await findByIdAndUpdate(req.params.id, author, {});
       console.log(updatedAuthor)
       res.redirect(updatedAuthor.url);
       return;

@@ -1,5 +1,4 @@
-const mongoose = require('mongoose')
-const Schema = mongoose.Schema 
+import { Schema, model } from 'mongoose';
 
 const GenreSchema = new Schema({
     name: {
@@ -15,4 +14,4 @@ GenreSchema.virtual('url').get(function() {
 })
 
 
-module.exports = mongoose.model('Genre', GenreSchema)
+export default model('Genre', GenreSchema)

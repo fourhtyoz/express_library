@@ -1,12 +1,12 @@
-const Book = require("../models/book");
-const Author = require("../models/author");
-const Genre = require("../models/genre");
-const BookInstance = require("../models/bookinstance");
-const asyncHandler = require("express-async-handler");
-const { body, validationResult } = require("express-validator");
+import Book, { countDocuments, find, findById, findByIdAndUpdate } from '../models/book';
+import { countDocuments as _countDocuments, find as _find } from '../models/author';
+import { countDocuments as __countDocuments, find as __find } from '../models/genre';
+import { countDocuments as ___countDocuments, find as ___find } from '../models/bookinstance';
+import asyncHandler from 'express-async-handler';
+import { body, validationResult } from 'express-validator';
 
 
-exports.index = asyncHandler(async (req, res, next) => {
+export const index = asyncHandler(async (req, res, next) => {
     const [
         numBooks,
         numBookInstances,
@@ -14,14 +14,14 @@ exports.index = asyncHandler(async (req, res, next) => {
         numAuthors,
         numGenres,
       ] = await Promise.all([
-        Book.countDocuments({}).exec(),
-        BookInstance.countDocuments({}).exec(),
-        BookInstance.countDocuments({ status: "Available" }).exec(),
-        Author.countDocuments({}).exec(),
-        Genre.countDocuments({}).exec(),
+        countDocuments({}).exec(),
+        ___countDocuments({}).exec(),
+        ___countDocuments({ status: 'Available' }).exec(),
+        _countDocuments({}).exec(),
+        __countDocuments({}).exec(),
       ]);
     res.render('index.pug', {
-        title: "Local Library Home",
+        title: 'Local Library Home',
         book_count: numBooks,
         book_instance_count: numBookInstances,
         book_instance_available_count: numAvailableBookInstances,
@@ -30,30 +30,28 @@ exports.index = asyncHandler(async (req, res, next) => {
     })
 });
 
-// Display list of all books.
-exports.book_list = asyncHandler(async (req, res, next) => {
-    const allBooks = await Book.find({}, 'title author')
+export const book_list = asyncHandler(async (req, res, next) => {
+    const allBooks = await find({}, 'title author')
                             .sort({title: 1})
                             .populate('author')
                             .exec()
     res.render('book_list', {'title': 'Book list', book_list: allBooks})
 });
-// Display detail page for a specific book.
-exports.book_detail = asyncHandler(async (req, res, next) => {
+export const book_detail = asyncHandler(async (req, res, next) => {
     // Get details of books, book instances for specific book
     const [book, bookInstances] = await Promise.all([
-      Book.findById(req.params.id).populate("author").populate("genre").exec(),
-      BookInstance.find({ book: req.params.id }).exec(),
+      findById(req.params.id).populate('author').populate('genre').exec(),
+      ___find({ book: req.params.id }).exec(),
     ]);
   
     if (book === null) {
       // No results.
-      const err = new Error("Book not found");
+      const err = new Error('Book not found');
       err.status = 404;
       return next(err);
     }
   
-    res.render("book_detail", {
+    res.render('book_detail', {
       title: book.title,
       book: book,
       book_instances: bookInstances,
@@ -61,48 +59,46 @@ exports.book_detail = asyncHandler(async (req, res, next) => {
   });
   
 
-// Display book create form on GET.
-exports.book_create_get = asyncHandler(async (req, res, next) => {
+export const book_create_get = asyncHandler(async (req, res, next) => {
     // Get all authors and genres, which we can use for adding to our book.
     const [allAuthors, allGenres] = await Promise.all([
-      Author.find().sort({ family_name: 1 }).exec(),
-      Genre.find().sort({ name: 1 }).exec(),
+      _find().sort({ family_name: 1 }).exec(),
+      __find().sort({ name: 1 }).exec(),
     ]);
   
-    res.render("book_form", {
-      title: "Create Book",
+    res.render('book_form', {
+      title: 'Create Book',
       authors: allAuthors,
       genres: allGenres,
     });
   });
   
 
-// Handle book create on POST.
-exports.book_create_post = [
+export const book_create_post = [
     // Convert the genre to an array.
     (req, res, next) => {
       if (!Array.isArray(req.body.genre)) {
         req.body.genre =
-          typeof req.body.genre === "undefined" ? [] : [req.body.genre];
+          typeof req.body.genre === 'undefined' ? [] : [req.body.genre];
       }
       next();
     },
   
     // Validate and sanitize fields.
-    body("title", "Title must not be empty.")
+    body('title', 'Title must not be empty.')
       .trim()
       .isLength({ min: 1 })
       .escape(),
-    body("author", "Author must not be empty.")
+    body('author', 'Author must not be empty.')
       .trim()
       .isLength({ min: 1 })
       .escape(),
-    body("summary", "Summary must not be empty.")
+    body('summary', 'Summary must not be empty.')
       .trim()
       .isLength({ min: 1 })
       .escape(),
-    body("isbn", "ISBN must not be empty").trim().isLength({ min: 1 }).escape(),
-    body("genre.*").escape(),
+    body('isbn', 'ISBN must not be empty').trim().isLength({ min: 1 }).escape(),
+    body('genre.*').escape(),
     // Process request after validation and sanitization.
   
     asyncHandler(async (req, res, next) => {
@@ -123,18 +119,18 @@ exports.book_create_post = [
   
         // Get all authors and genres for form.
         const [allAuthors, allGenres] = await Promise.all([
-          Author.find().sort({ family_name: 1 }).exec(),
-          Genre.find().sort({ name: 1 }).exec(),
+          _find().sort({ family_name: 1 }).exec(),
+          __find().sort({ name: 1 }).exec(),
         ]);
   
         // Mark our selected genres as checked.
         for (const genre of allGenres) {
           if (book.genre.includes(genre._id)) {
-            genre.checked = "true";
+            genre.checked = 'true';
           }
         }
-        res.render("book_form", {
-          title: "Create Book",
+        res.render('book_form', {
+          title: 'Create Book',
           authors: allAuthors,
           genres: allGenres,
           book: book,
@@ -149,39 +145,36 @@ exports.book_create_post = [
   ];
   
 
-// Display book delete form on GET.
-exports.book_delete_get = asyncHandler(async (req, res, next) => {
-  res.send("NOT IMPLEMENTED: Book delete GET");
+export const book_delete_get = asyncHandler(async (req, res, next) => {
+  res.send('NOT IMPLEMENTED: Book delete GET');
 });
 
-// Handle book delete on POST.
-exports.book_delete_post = asyncHandler(async (req, res, next) => {
-  res.send("NOT IMPLEMENTED: Book delete POST");
+export const book_delete_post = asyncHandler(async (req, res, next) => {
+  res.send('NOT IMPLEMENTED: Book delete POST');
 });
 
-// Display book update form on GET.
-exports.book_update_get = asyncHandler(async (req, res, next) => {
+export const book_update_get = asyncHandler(async (req, res, next) => {
     // Get book, authors and genres for form.
     const [book, allAuthors, allGenres] = await Promise.all([
-      Book.findById(req.params.id).populate("author").exec(),
-      Author.find().sort({ family_name: 1 }).exec(),
-      Genre.find().sort({ name: 1 }).exec(),
+      findById(req.params.id).populate('author').exec(),
+      _find().sort({ family_name: 1 }).exec(),
+      __find().sort({ name: 1 }).exec(),
     ]);
   
     if (book === null) {
       // No results.
-      const err = new Error("Book not found");
+      const err = new Error('Book not found');
       err.status = 404;
       return next(err);
     }
   
     // Mark our selected genres as checked.
     allGenres.forEach((genre) => {
-      if (book.genre.includes(genre._id)) genre.checked = "true";
+      if (book.genre.includes(genre._id)) genre.checked = 'true';
     });
   
-    res.render("book_form", {
-      title: "Update Book",
+    res.render('book_form', {
+      title: 'Update Book',
       authors: allAuthors,
       genres: allGenres,
       book: book,
@@ -189,32 +182,31 @@ exports.book_update_get = asyncHandler(async (req, res, next) => {
   });
   
 
-// Handle book update on POST.
-exports.book_update_post = [
+export const book_update_post = [
     // Convert the genre to an array.
     (req, res, next) => {
       if (!Array.isArray(req.body.genre)) {
         req.body.genre =
-          typeof req.body.genre === "undefined" ? [] : [req.body.genre];
+          typeof req.body.genre === 'undefined' ? [] : [req.body.genre];
       }
       next();
     },
   
     // Validate and sanitize fields.
-    body("title", "Title must not be empty.")
+    body('title', 'Title must not be empty.')
       .trim()
       .isLength({ min: 1 })
       .escape(),
-    body("author", "Author must not be empty.")
+    body('author', 'Author must not be empty.')
       .trim()
       .isLength({ min: 1 })
       .escape(),
-    body("summary", "Summary must not be empty.")
+    body('summary', 'Summary must not be empty.')
       .trim()
       .isLength({ min: 1 })
       .escape(),
-    body("isbn", "ISBN must not be empty").trim().isLength({ min: 1 }).escape(),
-    body("genre.*").escape(),
+    body('isbn', 'ISBN must not be empty').trim().isLength({ min: 1 }).escape(),
+    body('genre.*').escape(),
   
     // Process request after validation and sanitization.
     asyncHandler(async (req, res, next) => {
@@ -227,7 +219,7 @@ exports.book_update_post = [
         author: req.body.author,
         summary: req.body.summary,
         isbn: req.body.isbn,
-        genre: typeof req.body.genre === "undefined" ? [] : req.body.genre,
+        genre: typeof req.body.genre === 'undefined' ? [] : req.body.genre,
         _id: req.params.id, // This is required, or a new ID will be assigned!
       });
   
@@ -236,18 +228,18 @@ exports.book_update_post = [
   
         // Get all authors and genres for form
         const [allAuthors, allGenres] = await Promise.all([
-          Author.find().sort({ family_name: 1 }).exec(),
-          Genre.find().sort({ name: 1 }).exec(),
+          _find().sort({ family_name: 1 }).exec(),
+          __find().sort({ name: 1 }).exec(),
         ]);
   
         // Mark our selected genres as checked.
         for (const genre of allGenres) {
           if (book.genre.indexOf(genre._id) > -1) {
-            genre.checked = "true";
+            genre.checked = 'true';
           }
         }
-        res.render("book_form", {
-          title: "Update Book",
+        res.render('book_form', {
+          title: 'Update Book',
           authors: allAuthors,
           genres: allGenres,
           book: book,
@@ -256,7 +248,7 @@ exports.book_update_post = [
         return;
       } else {
         // Data from form is valid. Update the record.
-        const updatedBook = await Book.findByIdAndUpdate(req.params.id, book, {});
+        const updatedBook = await findByIdAndUpdate(req.params.id, book, {});
         // Redirect to book detail page.
         res.redirect(updatedBook.url);
       }

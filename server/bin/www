@@ -1,12 +1,9 @@
 #!/usr/bin/env node
 
-/**
- * Module dependencies.
- */
-
-const app = require('../app');
-const debug = require('debug')('express-locallibrary-tutorial:server');
-const http = require('http');
+import app from '../app';
+import { createServer } from 'http';
+import debug from 'debug';
+const logger = debug('express-locallibrary-tutorial:server');
 
 /**
  * Get port from environment and store in Express.
@@ -19,7 +16,7 @@ app.set('port', port);
  * Create HTTP server.
  */
 
-const server = http.createServer(app);
+const server = createServer(app);
 
 /**
  * Listen on provided port, on all network interfaces.
@@ -86,5 +83,5 @@ function onListening() {
   const bind = typeof addr === 'string'
     ? 'pipe ' + addr
     : 'port ' + addr.port;
-  debug('Listening on ' + bind);
+  logger('Listening on ' + bind);
 }
