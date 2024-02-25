@@ -36,7 +36,8 @@ exports.book_list = asyncHandler(async (req, res, next) => {
                             .sort({title: 1})
                             .populate('author')
                             .exec()
-    res.render('book_list', {'title': 'Book list', book_list: allBooks})
+    res.json({books: allBooks})
+    // res.render('book_list', {'title': 'Book list', book_list: allBooks})
 });
 // Display detail page for a specific book.
 exports.book_detail = asyncHandler(async (req, res, next) => {

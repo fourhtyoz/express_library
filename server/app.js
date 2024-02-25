@@ -20,6 +20,7 @@ const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const compression = require('compression')
 const helmet = require("helmet");
+const cors = require('cors')
 const RateLimit = require("express-rate-limit");
 
 // DB Setup
@@ -47,6 +48,7 @@ const app = express();
 
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
+app.use(cors())
 app.use(
   helmet.contentSecurityPolicy({
     directives: {
