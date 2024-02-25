@@ -73,7 +73,6 @@ exports.genre_create_post = [
       }
     }),
   ];
-  
 
 // Display Genre delete form on GET.
 exports.genre_delete_get = asyncHandler(async (req, res, next) => {
