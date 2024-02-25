@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react"
 import BooksList from "../books/BooksList"
 import axios from "axios"
+import styles from './Main.module.scss'
 
 
 export default function Main() {
@@ -24,16 +25,16 @@ export default function Main() {
     console.log(books)
 
     return (
-        <>
+        <div className={styles.wrapper}>
         {error 
         ? 
         <div className="error">error</div>
         :
-        <>
-            <h1>Books</h1>
+        <div className={styles.container}>
+            <h1 className={styles.title}>Books</h1>
             <BooksList books={books} />
-        </>
+        </div>
         }
-        </>
+        </div>
     )    
 }

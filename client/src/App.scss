@@ -1,0 +1,28 @@
+*, ::after, ::before {
+    margin: 0;
+    padding: 0;
+}
+
+:root {
+    /* CSS HEX */
+    --yale-blue: #083d77ff;
+    // --beige: rgb(227, 227, 227);
+    --naples-yellow: #f4d35eff;
+    --sandy-brown: #ee964bff;
+    --tomato: #f95738ff;
+    --dark-text: #252525;
+    --light-text: #ffffff;
+}
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.page-container {
+    // position: relative;
+    // min-height: 100vh;
+}
+
+.main {
+    display: flex;
+}

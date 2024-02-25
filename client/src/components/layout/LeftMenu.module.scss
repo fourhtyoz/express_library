@@ -1,0 +1,15 @@
+.container {
+    background-color: var(--sandy-brown);
+    width: fit-content;
+    max-width: 500px;
+    padding: 50px 25px;
+    color: var(--dark-text);
+}
+
+.list {
+    list-style-type: none;
+}
+
+.list > li {
+    margin: 0 0 20px 0;
+}
