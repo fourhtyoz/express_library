@@ -1,8 +1,23 @@
-var createError = require('http-errors');
-var express = require('express');
-var path = require('path');
-var cookieParser = require('cookie-parser');
-var logger = require('morgan');
+// TODO:
+// es module instead of commonjs
+// admin
+// auth (jwt + any other popular auth model)
+// users
+// simple react front
+// cascade delete on models
+// comments + ratings
+// turn js into ts
+// setup nginx and https
+// react + express testing
+// dockerize
+// ci/cd on github
+
+
+const createError = require('http-errors');
+const express = require('express');
+const path = require('path');
+const cookieParser = require('cookie-parser');
+const logger = require('morgan');
 const compression = require('compression')
 const helmet = require("helmet");
 const RateLimit = require("express-rate-limit");
@@ -16,11 +31,11 @@ async function main() {
   await mongoose.connect(mongoDB);
 }
 
-var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
+const indexRouter = require('./routes/index');
+const usersRouter = require('./routes/users');
 const catalogRouter = require('./routes/catalog')
 
-var app = express();
+const app = express();
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
