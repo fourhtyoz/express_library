@@ -11,6 +11,7 @@
 // react + express testing
 // dockerize
 // ci/cd on github
+// grafana + sentry
 
 
 const createError = require('http-errors');
