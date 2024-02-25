@@ -11,42 +11,41 @@
 // react + express testing
 // dockerize
 // ci/cd on github
-// grafana + sentry
+// grafana / sentry
 
+import createError from 'http-errors';
+import express, { json, urlencoded } from 'express';
+import { join } from 'path';
+import cookieParser from 'cookie-parser';
+import logger from 'morgan';
+import compression from 'compression'; // once nginx is setup wont be needed anymore
+import { contentSecurityPolicy } from 'helmet';
+import RateLimit from 'express-rate-limit';
+import * as db from 'mongoose';
 
-const createError = require('http-errors');
-const express = require('express');
-const path = require('path');
-const cookieParser = require('cookie-parser');
-const logger = require('morgan');
-const compression = require('compression')
-const helmet = require("helmet");
-const RateLimit = require("express-rate-limit");
-const mongoose = require('mongoose')
-
-mongoose.set('strictQuery', false)
+db.set('strictQuery', false)
 const mongoDB = 'mongodb://127.0.0.1:27017/library'
 main().catch((err) => console.log(err));
 
 async function main() {
-  await mongoose.connect(mongoDB);
+  await db.connect(mongoDB);
 }
 
-const indexRouter = require('./routes/index');
-const usersRouter = require('./routes/users');
-const catalogRouter = require('./routes/catalog')
+import indexRouter from './routes/index';
+import usersRouter from './routes/users';
+import catalogRouter from './routes/catalog';
 
 const app = express();
 
 // view engine setup
-app.set('views', path.join(__dirname, 'views'));
+app.set('views', join(__dirname, 'views'));
 app.set('view engine', 'pug');
 
 // Set CSP headers to allow our Bootstrap and Jquery to be served
 app.use(
-  helmet.contentSecurityPolicy({
+  contentSecurityPolicy({
     directives: {
-      "script-src": ["'self'", "code.jquery.com", "cdn.jsdelivr.net"],
+      'script-src': ['self', 'code.jquery.com', 'cdn.jsdelivr.net'],
     },
   }),
 );
@@ -59,10 +58,10 @@ const limiter = RateLimit({
 app.use(limiter);
 app.use(compression()); // Compress all routes
 app.use(logger('dev'));
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+app.use(json());
+app.use(urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(join(__dirname, 'public')));
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
@@ -84,4 +83,4 @@ app.use(function(err, req, res, next) {
   res.render('error');
 });
 
-module.exports = app;
+export default app
